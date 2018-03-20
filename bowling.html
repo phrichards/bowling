@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
+
 <body>
     <form>
         <div id="frame1">
@@ -69,23 +71,26 @@
             <span class="score"></span>
         </div>
 
-        <p>Score: <span id="finalScore"></span></p>
+        <p>Score:
+            <span id="finalScore"></span>
+        </p>
     </form>
 </body>
 
 <script>
-    var frames = document.getElementsByClassName('frame');
-    frames = Array.from(frames);
+    var frames = Array.from(document.getElementsByClassName('frame'));
+    frames = (frames);
     let score = 0;
     let frameScore = 0;
     let totalFrameScore = 0;
     let previousFrameScore = 0;
-    var strike = false;
-    var spare = false;
-    var ball1Score = 0;
-    var ball;
-    var strikeFrame;
-    var spareFrame;
+    let strike = false;
+    let spare = false;
+    let ball1Score = 0;
+    let ball;
+    let strikeFrame;
+    let spareFrame;
+    let scores = [];
 
     function validateScore(val, id, frame) {
         if (id.indexOf('b1') > -1) {
@@ -93,10 +98,15 @@
             totalFrameScore = 0;
             var reg = new RegExp(/^[xX0-9]$/g);
             if (val.toLowerCase() == 'x') {
-                strike = true; 
+                scores.push('x');
+                console.log(scores);
+                strike = true;
             } else {
                 frameScore += parseInt(val);
                 ball1Score = frameScore;
+                console.log('PUSHING');
+                console.log(parseInt(val));
+                scores.push(parseInt(val));
             }
             ball = 1;
         } else if (id.indexOf('b2') > -1) {
@@ -106,15 +116,19 @@
                 return;
             } else {
                 if (val == '/') {
+                    scores.push(10);
                     spare = true;
                 } else {
                     frameScore += parseInt(val);
                     totalFrameScore = frameScore;
+                    console.log('PUSHING');
+                    console.log(parseInt(val));
+                    scores.push(parseInt(val));
                 }
             }
             ball = 2;
         }
-        
+
         if (!reg.test(val)) {
             alert("Please enter a valid score");
         } else {
@@ -126,11 +140,9 @@
             }
             next.disabled = false;
             next.focus();
-            if (strike || spare || ball == 2) {
                 calculateScore(totalFrameScore, frame);
                 strike = false;
                 spare = false;
-            }
         }
     }
 
@@ -141,18 +153,36 @@
         console.log(`spare? ${spare}`);
         console.log(`FrameScore: ${frameScore}`);
         console.log(`TotalFrameScore: ${totalFrameScore}`);
-        if (strike) {
-            console.log(`frame: ${frame}`);
-            strikeFrame = frame;
-            console.log(`strikeFrame? ${strikeFrame}`);
-        }
+        console.log('is strike?');
+        // console.log(scores[scores.length - 3]);
 
-        if (spare) {
-            console.log(`frame: ${frame}`);
-            spareFrame = frame;
-            console.log(`spareFrame? ${spareFrame}`);
-            console.log(`ball1Score: ${ball1Score}`);
+        if (scores[scores.length - 3] == 'x') {
+            if (scores[scores.length - 2] == 'x' && scores[scores.length - 3] == 'x') {
+                scores[scores.length - 3] = parseInt(30);
+                score += scores[scores.length - 3]
+            } else if (scores[scores.length - 2] == 'x') {
+                console.log('minus 2');
+                scores[scores.length - 2] = parseInt(20 + scores[scores.length - 1]);
+                score += scores[scores.length - 2];
+            } else if (scores[scores.length - 3] == 'x') {
+                console.log('minus 3');
+                scores[scores.length - 3] = parseInt(10 + scores[scores.length - 2] + scores[scores.length - 1]);
+                score += scores[scores.length - 3];
+            }
         }
+        console.log(scores);
+        // if (strike) {
+        //     console.log(`frame: ${frame}`);
+        //     strikeFrame = frame;
+        //     console.log(`strikeFrame? ${strikeFrame}`);
+        // }
+
+        // if (spare) {
+        //     console.log(`frame: ${frame}`);
+        //     spareFrame = frame;
+        //     console.log(`spareFrame? ${spareFrame}`);
+        //     console.log(`ball1Score: ${ball1Score}`);
+        // }
         console.log(`frame: ${frame}`);
         console.log(`strikeFrame: ${strikeFrame}`);
         if (strikeFrame > 0 && frame == strikeFrame + 1) {
@@ -160,7 +190,7 @@
             console.log(`previousFrameScore: ${previousFrameScore}`);
             score += previousFrameScore;
             score += totalFrameScore;
-            strikeFrame = null;         
+            strikeFrame = null;
         } else if (spareFrame > 0 && frame == spareFrame + 1) {
             console.log('SPAER');
             previousFrameScore = ball1Score + 10;
@@ -173,9 +203,10 @@
         }
         document.getElementById('finalScore').innerHTML = score;
     }
-    
+
     // To Do
     // figure out scoring for spares and strikes
     // add reset button
 </script>
+
 </html>
